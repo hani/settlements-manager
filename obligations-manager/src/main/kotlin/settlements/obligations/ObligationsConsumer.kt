@@ -5,7 +5,6 @@ import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.streams.KafkaStreams
 import org.apache.kafka.streams.StreamsBuilder
 import org.apache.kafka.streams.StreamsConfig
-import org.apache.kafka.streams.kstream.Printed
 import settlements.Obligation
 import settlements.ObligationState
 import settlements.SettlementStatus
@@ -35,7 +34,7 @@ class ObligationsConsumer {
         state.obligation = obligation
         state
       }
-    }).print(Printed.toSysOut())
+    }).to("obligations-state")
     KafkaStreams(builder.build(), streamsConfiguration).start()
   }
 }
