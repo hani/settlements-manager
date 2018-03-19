@@ -1,0 +1,12 @@
+{
+  "namespace": "settlements",
+  "type": "enum",
+  "name": "SettlementStatus",
+  "symbols": [
+    "OPEN",
+    "FULLY_SETTLED",
+    "PARTIALLY_SETTLED",
+    "OVER_SETTLED",
+    "CANCELLED"
+  ]
+}

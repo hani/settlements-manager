@@ -1,0 +1,31 @@
+{
+  "namespace": "settlements",
+  "type": "record",
+  "name": "Instruction",
+  "fields": [
+    {
+      "name": "id",
+      "type": "string"
+    },
+    {
+      "name": "quantity",
+      "type": "double"
+    },
+    {
+      "name": "security",
+      "type": "string"
+    },
+    {
+      "name": "custodian",
+      "type": "string"
+    },
+    {
+      "name": "account",
+      "type": "string"
+    },
+    {
+      "name": "direction",
+      "type": "Direction"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "namespace": "settlements",
+  "type": "record",
+  "name": "Obligation",
+  "fields": [
+    {
+      "name": "id",
+      "type": "string"
+    },
+    {
+      "name": "quantity",
+      "type": "double"
+    },
+    {
+      "name": "amount",
+      "type": "double"
+    },
+    {
+      "name": "security",
+      "type": "string"
+    },
+    {
+      "name": "currency",
+      "type": "core.Currency",
+      "default": "UNSPECIFIED"
+    },
+    {
+      "name": "direction",
+      "type": "Direction"
+    },
+    {
+      "name": "valueDate",
+      "type": "int",
+      "logicalTye": "date",
+      "default": 0
+    },
+    {
+      "name": "tradeDate",
+      "type": "long",
+      "logicalType": "timestamp-micros",
+      "default": 0
+    }
+  ]
+}

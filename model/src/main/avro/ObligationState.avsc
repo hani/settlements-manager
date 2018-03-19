@@ -1,0 +1,27 @@
+{
+  "namespace": "settlements",
+  "type": "record",
+  "name": "ObligationState",
+  "fields": [
+    {
+      "name": "id",
+      "type": "string"
+    },
+    {
+      "name": "obligation",
+      "type": "Obligation"
+    },
+    {
+      "name": "status",
+      "type": "SettlementStatus"
+    },
+    {
+      "name": "openQuantity",
+      "type": "double"
+    },
+    {
+      "name": "openAmount",
+      "type": "double"
+    }
+  ]
+}

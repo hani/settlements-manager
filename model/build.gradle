@@ -1,0 +1,11 @@
+plugins {
+  id "com.commercehub.gradle.plugin.avro" version "0.9.1"
+}
+
+dependencies {
+  compile "org.apache.avro:avro:1.8.2"
+}
+
+avro {
+  fieldVisibility = "PRIVATE"
+}

@@ -1,0 +1,5 @@
+rootProject.name = 'settlement-manager'
+include 'model'
+include 'obligations-manager'
+include 'producers'
+

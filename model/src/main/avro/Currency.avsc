@@ -1,0 +1,20 @@
+{
+  "namespace": "core",
+  "type": "enum",
+  "name": "Currency",
+  "symbols": [
+    "UNSPECIFIED",
+    "USD",
+    "GBP",
+    "OMR",
+    "CAD",
+    "JPY",
+    "EUR",
+    "DKK",
+    "AUD",
+    "CHF",
+    "NOK",
+    "ZAR",
+    "HKD"
+  ]
+}

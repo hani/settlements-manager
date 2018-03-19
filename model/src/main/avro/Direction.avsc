@@ -1,0 +1,9 @@
+{
+  "namespace": "settlements",
+  "type": "enum",
+  "name": "Direction",
+  "symbols": [
+    "RECEIVE",
+    "DELIVER"
+  ]
+}

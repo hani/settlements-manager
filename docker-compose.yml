@@ -1,0 +1,92 @@
+---
+version: '3'
+services:
+  zk1:
+    image: confluentinc/cp-zookeeper:latest
+    ports: 
+      - "22181:22181"
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_CLIENT_PORT: 22181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVERS: zk1:22888:23888;zk2:32888:33888;zk3:42888:43888
+
+  zk2:
+    image: confluentinc/cp-zookeeper:latest
+    ports: 
+      - "32181:32181"
+    environment:
+      ZOOKEEPER_SERVER_ID: 2
+      ZOOKEEPER_CLIENT_PORT: 32181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVERS: zk1:22888:23888;zk2:32888:33888;zk3:42888:43888
+
+  zk3:
+    image: confluentinc/cp-zookeeper:latest
+    ports: 
+      - "42181:42181"
+    environment:
+      ZOOKEEPER_SERVER_ID: 3
+      ZOOKEEPER_CLIENT_PORT: 42181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVERS: zk1:22888:23888;zk2:32888:33888;zk3:42888:43888
+
+  kafka-1:
+    image: confluentinc/cp-kafka:latest
+    ports:
+      - "19092:19092"
+    depends_on:
+      - zk1
+      - zk2
+      - zk3
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zk1:22181,zk2:32181,zk3:42181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://192.168.0.9:19092
+
+  kafka-2:
+    image: confluentinc/cp-kafka:latest
+    ports:
+      - "29092:29092"
+    depends_on:
+      - zk1
+      - zk2
+      - zk3
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ZOOKEEPER_CONNECT: zk1:22181,zk2:32181,zk3:42181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://192.168.0.9:29092
+
+  kafka-3:
+    image: confluentinc/cp-kafka:latest
+    ports:
+      - "39092:39092"
+    depends_on:
+      - zk1
+      - zk2
+      - zk3
+    environment:
+      KAFKA_BROKER_ID: 3
+      KAFKA_ZOOKEEPER_CONNECT: zk1:22181,zk2:32181,zk3:42181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://192.168.0.9:39092
+
+  schema_registry:
+    image: confluentinc/cp-schema-registry
+    ports:
+      - "8081:8081"
+    depends_on:
+      - zk1
+      - zk2
+      - zk3
+      - kafka-1
+      - kafka-2
+      - kafka-3
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema_registry
+      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: 'zk1:22181'
