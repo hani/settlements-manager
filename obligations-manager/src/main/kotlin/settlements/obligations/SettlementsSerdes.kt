@@ -8,9 +8,7 @@ import org.apache.kafka.common.serialization.Serdes
 import settlements.Obligation
 import settlements.ObligationState
 
-/**
- * @author Hani Suleiman
- */
+@Suppress("UNCHECKED_CAST")
 object SettlementsSerdes {
 
   private val config = mapOf(
