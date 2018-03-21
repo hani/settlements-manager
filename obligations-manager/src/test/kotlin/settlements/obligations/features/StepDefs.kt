@@ -24,7 +24,7 @@ class StepDefs : En {
     var driver: ProcessorTopologyTestDriver? = null
     
     properties.putAll(mapOf(
-        "bootstrap.servers" to "localhost:1909",
+        "bootstrap.servers" to "dummy",
         "application.id" to "filter",
         "auto.offset.reset" to "earliest"
     ))
