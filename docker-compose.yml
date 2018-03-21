@@ -48,7 +48,7 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zk1:22181,zk2:32181,zk3:42181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://192.168.0.9:19092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://$MY_IP:19092
 
   kafka-2:
     image: confluentinc/cp-kafka:latest
@@ -61,7 +61,7 @@ services:
     environment:
       KAFKA_BROKER_ID: 2
       KAFKA_ZOOKEEPER_CONNECT: zk1:22181,zk2:32181,zk3:42181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://192.168.0.9:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://$MY_IP:29092
 
   kafka-3:
     image: confluentinc/cp-kafka:latest
@@ -74,7 +74,7 @@ services:
     environment:
       KAFKA_BROKER_ID: 3
       KAFKA_ZOOKEEPER_CONNECT: zk1:22181,zk2:32181,zk3:42181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://192.168.0.9:39092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://$MY_IP:39092
 
   schema_registry:
     image: confluentinc/cp-schema-registry
