@@ -35,7 +35,7 @@ class ObligationsProducer {
           LocalDate.now().plusDays(2).epochDays,
           System.nanoTime() / 1000
       )
-      producer.send(ProducerRecord<String, Obligation>("obligations", it.toString(), obligation))
+      producer.send(ProducerRecord<String, Obligation>("obligations", obligation.id, obligation))
     }
     producer.close()
   }
