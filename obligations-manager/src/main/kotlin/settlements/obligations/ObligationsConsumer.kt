@@ -20,7 +20,9 @@ class ObligationsConsumer {
         StreamsConfig.STATE_DIR_CONFIG to "data"
     ))
     val builder = topology(CachedSchemaRegistryClient("http://localhost:8081", 1000))
-    KafkaStreams(builder, streamsConfiguration).start()
+    val streams = KafkaStreams(builder, streamsConfiguration)
+    streams.start()
+    Runtime.getRuntime().addShutdownHook(Thread(streams::close))
   }
   
   companion object {
