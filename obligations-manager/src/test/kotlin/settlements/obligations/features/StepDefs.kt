@@ -11,6 +11,7 @@ import org.apache.kafka.test.ProcessorTopologyTestDriver
 import org.slf4j.LoggerFactory
 import settlements.Obligation
 import settlements.ObligationState
+import settlements.generators.ObligationGen
 import settlements.obligations.ObligationsConsumer
 import settlements.obligations.SettlementsSerdes
 import java.util.*
@@ -56,7 +57,7 @@ class StepDefs : En {
 
     Given("^The following new obligations:$") { table: DataTable ->
       val obligations = table.rows.map {
-        val obligation = Obligation()
+        val obligation = ObligationGen.generate()
         obligation.setProperties(it)
         obligation
       }

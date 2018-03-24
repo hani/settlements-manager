@@ -1,7 +1,7 @@
 {
   "namespace": "settlements",
   "type": "record",
-  "name": "Instruction",
+  "name": "Confirmation",
   "fields": [
     {
       "name": "id",
