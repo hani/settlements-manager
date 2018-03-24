@@ -4,13 +4,17 @@ import cucumber.api.DataTable
 import cucumber.api.java8.En
 import io.confluent.kafka.streams.serdes.avro.InMemorySpecificAvroSerde
 import io.kotlintest.matchers.shouldEqual
+import org.apache.avro.specific.SpecificRecord
 import org.apache.commons.beanutils.PropertyUtils
 import org.apache.kafka.common.serialization.Serdes
+import org.apache.kafka.common.serialization.StringSerializer
 import org.apache.kafka.streams.StreamsConfig
 import org.apache.kafka.test.ProcessorTopologyTestDriver
 import org.slf4j.LoggerFactory
+import settlements.Confirmation
 import settlements.Obligation
 import settlements.ObligationState
+import settlements.generators.ConfirmationGen
 import settlements.generators.ObligationGen
 import settlements.obligations.ObligationsConsumer
 import settlements.obligations.SettlementsSerdes
@@ -35,6 +39,7 @@ class StepDefs : En {
     ))
     val registry = InMemorySpecificAvroSerde.SchemaRegistryClient
     registry.register("obligations-value", Obligation().schema)
+    registry.register("confirmations-value", Confirmation().schema)
     registry.register("obligations-state-value", ObligationState().schema)
     registry.register("test-driver-application-obligations-state-STATE-STORE-0000000001-changelog", ObligationState().schema)
     registry.register("test-driver-application-obligations-state-STATE-STORE-0000000001-changelog-value", ObligationState().schema)
@@ -47,24 +52,32 @@ class StepDefs : En {
       driver?.close()
     }
 
-    fun publish(topic: String, obligations: List<Obligation>) {
-      obligations.forEach {
-        driver?.process(topic, it.id, it,
-            Serdes.String().serializer(),
-            SettlementsSerdes.obligation(registry).serializer())
+    fun publish(topic: String, records: List<Pair<String, SpecificRecord>>) {
+      records.forEach {
+        driver?.process(topic, it.first, it.second,
+            StringSerializer(), InMemorySpecificAvroSerde<SpecificRecord>().serializer())
       }
     }
 
-    Given("^The following new obligations:$") { table: DataTable ->
+    Given("^the following new obligations:$") { table: DataTable ->
       val obligations = table.rows.map {
         val obligation = ObligationGen.generate()
         obligation.setProperties(it)
         obligation
       }
-      publish("obligations", obligations)
+      publish("obligations", obligations.map { it.id to it })
     }
 
-    Then("^The following obligation states are published:$") { table: DataTable ->
+    Given("^the following confirmations are received:$") { table: DataTable ->
+      val confirmations = table.rows.map {
+        val confirmation = ConfirmationGen.generate()
+        confirmation.setProperties(it)
+        confirmation
+      }
+      publish("confirmations", confirmations.map { it.id to it })
+    }
+
+    Then("^the following obligation states are published:$") { table: DataTable ->
       table.rows.forEach {
         val output = driver?.readOutput("obligations-state", Serdes.String().deserializer(), SettlementsSerdes.obligationState(registry).deserializer())
         val actual = PropertyUtils.describe(output!!.value())
