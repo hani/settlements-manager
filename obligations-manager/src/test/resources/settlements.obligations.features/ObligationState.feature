@@ -11,11 +11,26 @@ Feature: Obligation state lifecycle
       | id | status | openQuantity | openAmount |
       | 1  | OPEN   | 20.0         | 10.0       |
 
+  Scenario: Updated obligation overwrites existing one
+    Given the following new obligations:
+      | id | security | quantity | amount |
+      | 1  | abc      | 20       | 10     |
+    When the following new obligations:
+      | id | security | quantity | amount |
+      | 1  | abc      | 50       | 50     |
+    Then the following obligation states are published:
+      | id | status | openQuantity | openAmount |
+      | 1  | OPEN   | 20.0         | 10.0       |
+      | 1  | OPEN   | 50.0         | 50.0       |
+    And the obligation state store should contain:
+      | id | status | openQuantity | openAmount |
+      | 1  | OPEN   | 50.0         | 50.0       |
+
   Scenario Outline: Apply confirmation to obligation state
     Given the following new obligations:
       | id | security | quantity | amount |
-      | 1  | abc      | 200      | 100    |
-      | 2  | abc      | 20       | 10     |
+      | 1  | first    | 200      | 100    |
+      | 2  | second   | 20       | 10     |
     And the following obligation states are published:
       | id | openQuantity | openAmount | status |
       | 1  | 200.0        | 100.0      | OPEN   |
