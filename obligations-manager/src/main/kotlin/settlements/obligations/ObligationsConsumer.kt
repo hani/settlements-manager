@@ -3,12 +3,11 @@ package settlements.obligations
 import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.streams.KafkaStreams
-import org.apache.kafka.streams.StreamsBuilder
 import org.apache.kafka.streams.StreamsConfig
 import org.apache.kafka.streams.Topology
-import settlements.Obligation
-import settlements.ObligationState
-import settlements.SettlementStatus
+import settlements.obligations.topology.ApplyConfirmations
+import settlements.obligations.topology.CreateOrUpdateObligationState
+import settlements.obligations.topology.PersistObligations
 import java.util.*
 
 class ObligationsConsumer {
@@ -30,18 +29,16 @@ class ObligationsConsumer {
 
   companion object {
     fun topology(): Topology {
-      val builder = StreamsBuilder()
-      val obligations = builder.stream<String, Obligation>("obligations")
-      val obligationsState = builder.table<String, ObligationState>("obligations-state")
-      obligations.leftJoin(obligationsState, { obligation, state ->
-        if (state == null) {
-          ObligationState(obligation.id, obligation, SettlementStatus.OPEN, obligation.quantity, obligation.amount)
-        } else {
-          state.obligation = obligation
-          state
-        }
-      }).to("obligations-state")
-      return builder.build()
+      val topology = Topology()
+      topology.addStateStore(ObligationStatesStore())
+
+      PersistObligations(topology)
+      CreateOrUpdateObligationState(topology)
+      ApplyConfirmations(topology)
+      
+      topology.addSink("ObligationsState", "obligations-state", ApplyConfirmations.name, CreateOrUpdateObligationState.name)
+      
+      return topology
     }
   }
 }

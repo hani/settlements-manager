@@ -13,9 +13,13 @@ Feature: Obligation state lifecycle
       | id | security | quantity | amount |
       | 1  | abc      | 200      | 100    |
       | 2  | abc      | 20       | 10     |
+    And the following obligation states are published:
+      | id | openQuantity | openAmount | status |
+      | 1  | 200.0        | 100.0      | OPEN   |
+      | 2  | 20.0         | 10.0       | OPEN   |
     When the following confirmations are received:
-      | obligationId | quantity   |
-      | <id>         | <quantity> |
+      | id   | obligationId | quantity   |
+      | <id> | <id>         | <quantity> |
     Then the following obligation states are published:
       | id   | status   | openQuantity   |
       | <id> | <status> | <openQuantity> |
