@@ -88,14 +88,16 @@ class StepDefs : En {
     }
 
     Then("^the obligation state store should contain:$") { table: DataTable ->
-      val actual = streams?.store(ObligationStateStore.name, QueryableStoreTypes.keyValueStore<String, ObligationState>())?.all()?.asSequence()
-      actual?.count() shouldEqual table.rows.size
+      val store = streams?.store(ObligationStateStore.name, QueryableStoreTypes.keyValueStore<String, ObligationState>())
+      val actual = store?.all()?.asSequence()
       actual?.zip(table.rows.asSequence())?.forEach { (actual, expected) ->
+        println("Store key ${actual.key}")
         val actualMap = PropertyUtils.describe(actual!!.value)
         expected.forEach {
-          actualMap[it.key] shouldEqual it.value
+          actualMap[it.key].toString() shouldEqual it.value
         }
       }
+      store?.all()?.asSequence()?.count() shouldEqual table.rows.size
     }
 
     Given("^the following confirmations are received:$") { table: DataTable ->

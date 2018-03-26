@@ -7,6 +7,9 @@ Feature: Obligation state lifecycle
     Then the following obligation states are published:
       | id | status | openQuantity | openAmount |
       | 1  | OPEN   | 20.0         | 10.0       |
+    And the obligation state store should contain:
+      | id | status | openQuantity | openAmount |
+      | 1  | OPEN   | 20.0         | 10.0       |
 
   Scenario Outline: Apply confirmation to obligation state
     Given the following new obligations:
