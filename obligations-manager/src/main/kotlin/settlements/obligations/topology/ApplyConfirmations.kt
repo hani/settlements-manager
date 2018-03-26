@@ -3,7 +3,7 @@ package settlements.obligations.topology
 import org.apache.kafka.streams.Topology
 import org.apache.kafka.streams.processor.ProcessorSupplier
 import settlements.obligations.ConfirmationProcessor
-import settlements.obligations.ObligationStatesStore
+import settlements.obligations.ObligationStateStore
 
 object ApplyConfirmations {
   const val name = "ApplyConfirmations"
@@ -16,6 +16,6 @@ object ApplyConfirmations {
             ProcessorSupplier { ConfirmationProcessor() },
             "confirmations-source"
         )
-    topology.connectProcessorAndStateStores(name, ObligationStatesStore.name)
+    topology.connectProcessorAndStateStores(name, ObligationStateStore.name)
   }
 }

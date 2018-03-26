@@ -16,6 +16,7 @@ import settlements.Obligation
 import settlements.ObligationState
 import settlements.generators.ConfirmationGen
 import settlements.generators.ObligationGen
+import settlements.obligations.ObligationStateStore
 import settlements.obligations.ObligationsConsumer
 import settlements.obligations.SettlementsSerdes
 import java.util.*
@@ -41,8 +42,6 @@ class StepDefs : En {
     registry.register("obligations-value", Obligation().schema)
     registry.register("confirmations-value", Confirmation().schema)
     registry.register("obligations-state-value", ObligationState().schema)
-    registry.register("test-driver-application-obligations-state-STATE-STORE-0000000001-changelog", ObligationState().schema)
-    registry.register("test-driver-application-obligations-state-STATE-STORE-0000000001-changelog-value", ObligationState().schema)
 
     Before { _ ->
       driver = ProcessorTopologyTestDriver(StreamsConfig(properties), ObligationsConsumer.topology())
@@ -68,6 +67,17 @@ class StepDefs : En {
       publish("obligations", obligations.map { it.id to it })
     }
 
+    Then("^the obligation state store should contain:$") { table: DataTable ->
+      val actual = driver?.getKeyValueStore<String, ObligationState>(ObligationStateStore.name)?.all()?.asSequence()
+      actual?.count() shouldEqual table.rows.size
+      actual?.zip(table.rows.asSequence())?.forEach { (actual, expected) ->
+        val actualMap = PropertyUtils.describe(actual!!.value)
+        expected.forEach { 
+          actualMap[it.key] shouldEqual it.value
+        }
+      }
+    }
+    
     Given("^the following confirmations are received:$") { table: DataTable ->
       val confirmations = table.rows.map {
         val confirmation = ConfirmationGen.generate()

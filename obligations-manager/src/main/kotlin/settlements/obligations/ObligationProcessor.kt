@@ -14,7 +14,7 @@ class ObligationProcessor : AbstractProcessor<String, Obligation>() {
   override fun init(context: ProcessorContext) {
     super.init(context)
     @Suppress("UNCHECKED_CAST")
-    store = context.getStateStore(ObligationStatesStore.name) as ReadOnlyKeyValueStore<String, ObligationState>
+    store = context.getStateStore(ObligationStateStore.name) as ReadOnlyKeyValueStore<String, ObligationState>
   }
 
   override fun process(key: String, obligation: Obligation) {

@@ -3,7 +3,7 @@ package settlements.obligations.topology
 import org.apache.kafka.streams.Topology
 import org.apache.kafka.streams.processor.ProcessorSupplier
 import settlements.obligations.ObligationProcessor
-import settlements.obligations.ObligationStatesStore
+import settlements.obligations.ObligationStateStore
 
 object CreateOrUpdateObligationState {
   const val name = "CreateOrUpdateObligation"
@@ -15,6 +15,6 @@ object CreateOrUpdateObligationState {
             ProcessorSupplier { ObligationProcessor() },
             "obligations-source"
         )
-    topology.connectProcessorAndStateStores(name, ObligationStatesStore.name)
+    topology.connectProcessorAndStateStores(name, ObligationStateStore.name)
   }
 }

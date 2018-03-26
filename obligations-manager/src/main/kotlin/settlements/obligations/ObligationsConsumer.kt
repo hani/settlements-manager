@@ -30,7 +30,7 @@ class ObligationsConsumer {
   companion object {
     fun topology(): Topology {
       val topology = Topology()
-      topology.addStateStore(ObligationStatesStore())
+      topology.addStateStore(ObligationStateStore())
 
       PersistObligations(topology)
       CreateOrUpdateObligationState(topology)
