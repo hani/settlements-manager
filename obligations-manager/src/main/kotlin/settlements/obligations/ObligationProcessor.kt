@@ -18,11 +18,17 @@ class ObligationProcessor : AbstractProcessor<String, Obligation>() {
   }
 
   override fun process(key: String, obligation: Obligation) {
-    println("Processing $obligation")
     val existing = store?.get(key)
+    println("Processing $obligation, found existing $existing")
     val updated = if(existing == null) {
       ObligationState(obligation.id, obligation, SettlementStatus.OPEN, obligation.quantity, obligation.amount)
     } else {
+      existing.openQuantity = existing.openQuantity - (existing.obligation.quantity - obligation.quantity)
+      if(existing.openQuantity.toInt() == 0) existing.status = SettlementStatus.FULLY_SETTLED
+      else if(existing.openQuantity > 0) existing.status = SettlementStatus.PARTIALLY_SETTLED
+      
+      existing.openAmount = existing.openAmount - (existing.obligation.amount - obligation.amount)
+      
       existing.obligation = obligation
       existing
     }
