@@ -10,7 +10,7 @@ object ApplyConfirmations {
 
   operator fun invoke(topology: Topology) {
     topology
-        .addSource("confirmations-source", "confirmations")
+        .addSource("confirmations-source", Topics.Confirmations)
         .addProcessor(
             name,
             ProcessorSupplier { ConfirmationProcessor() },

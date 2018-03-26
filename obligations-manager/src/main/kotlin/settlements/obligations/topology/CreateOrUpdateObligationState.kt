@@ -10,7 +10,7 @@ object CreateOrUpdateObligationState {
   
   operator fun invoke(topology: Topology) {
     topology
-        .addSource("obligations-source", "obligations")
+        .addSource("obligations-source", Topics.Obligations)
         .addProcessor(name,
             ProcessorSupplier { ObligationProcessor() },
             "obligations-source"

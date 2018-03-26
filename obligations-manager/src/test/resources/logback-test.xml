@@ -5,6 +5,11 @@
     </encoder>
   </appender>
   <logger name="org.reflections.Reflections" level="error" />
+  <logger name="kafka" level="warn" />
+  <logger name="org.apache.zookeeper" level="warn" />
+  <logger name="org.apache.zookeeper.ClientCnxn" level="error" />
+  <logger name="org.apache.kafka" level="warn" />
+  <logger name="org.I0Itec" level="warn" />
   <root level="info">
     <appender-ref ref="STDOUT"/>
   </root>

@@ -10,7 +10,7 @@ object PersistObligations {
   
   operator fun invoke(topology: Topology) {
     topology
-        .addSource("obligations-state-source", "obligation-state")
+        .addSource("obligations-state-source", Topics.ObligationState)
         .addProcessor(
             name,
             KTableSource<String, ObligationState>(ObligationStateStore.name),

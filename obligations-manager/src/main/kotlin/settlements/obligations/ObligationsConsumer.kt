@@ -8,6 +8,7 @@ import org.apache.kafka.streams.Topology
 import settlements.obligations.topology.ApplyConfirmations
 import settlements.obligations.topology.CreateOrUpdateObligationState
 import settlements.obligations.topology.PersistObligations
+import settlements.obligations.topology.Topics
 import java.util.*
 
 class ObligationsConsumer {
@@ -36,7 +37,7 @@ class ObligationsConsumer {
       CreateOrUpdateObligationState(topology)
       ApplyConfirmations(topology)
       
-      topology.addSink("ObligationsState", "obligations-state", ApplyConfirmations.name, CreateOrUpdateObligationState.name)
+      topology.addSink("ObligationsState", Topics.ObligationState, ApplyConfirmations.name, CreateOrUpdateObligationState.name)
       
       return topology
     }
