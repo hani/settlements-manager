@@ -6,14 +6,16 @@ import settlements.ObligationState
 import settlements.obligations.ObligationStateStore
 
 object PersistObligations {
+  const val name = "StoreObligationState"
+  
   operator fun invoke(topology: Topology) {
     topology
         .addSource("obligations-state-source", "obligation-state")
         .addProcessor(
-            "StoreObligationState",
+            name,
             KTableSource<String, ObligationState>(ObligationStateStore.name),
             "obligations-state-source"
         )
-    topology.connectProcessorAndStateStores("StoreObligationState", ObligationStateStore.name)
+    topology.connectProcessorAndStateStores(name, ObligationStateStore.name)
   }
 }
