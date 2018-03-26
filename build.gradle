@@ -25,6 +25,11 @@ subprojects {
     compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     compile "ch.qos.logback:logback-classic:1.2.3"
   }
+
+  configurations.all {
+    exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+    exclude group: "log4j"
+  }
 }
 
 allprojects {
@@ -35,9 +40,4 @@ allprojects {
       url "https://packages.confluent.io/maven"
     }
   }
-}
-
-configurations.all {
-  exclude group: 'org.slf4j', module: 'slf4j-log4j12'
-  exclude group: "log4j"
 }

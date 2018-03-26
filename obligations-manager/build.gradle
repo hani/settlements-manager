@@ -2,12 +2,14 @@ dependencies {
   compile project(":model")
   compile "org.apache.kafka:kafka-streams:1.0.1"
   compile "org.apache.kafka:kafka-clients:1.0.1"
-  compile("io.confluent:kafka-streams-avro-serde:4.0.0") {
-    exclude group: 'org.slf4j'
-  }
+  compile "io.confluent:kafka-streams-avro-serde:4.0.0"
   testCompile "io.kotlintest:kotlintest:2.0.7"
   testCompile "io.cucumber:cucumber-java8:2.4.0"
   testCompile "commons-beanutils:commons-beanutils:1.9.3"
+  testCompile "org.apache.kafka:kafka_2.11:1.0.1"
+  testCompile "org.apache.kafka:kafka_2.11:1.0.1:test"
   testCompile "org.apache.kafka:kafka-streams:1.0.1:test"
   testCompile "org.apache.kafka:kafka-clients:1.0.1:test"
+  testCompile "org.apache.curator:curator-test:2.9.0"
+  testCompile "org.slf4j:log4j-over-slf4j:1.7.25"
 }
