@@ -43,7 +43,7 @@ Feature: Obligation state lifecycle
       | <id> | <status> | <openQuantity> |
     Examples:
       | id | quantity | status            | openQuantity |
-      | 1  | 150      | PARTIALLY_SETTLED | 50           |
-      | 1  | 50       | FULLY_SETTLED     | 0            |
-      | 2  | 20       | FULLY_SETTLED     | 0            |
+      | 1  | 150      | PARTIALLY_SETTLED | 50.0         |
+      | 1  | 50       | FULLY_SETTLED     | 0.0          |
+      | 2  | 20       | FULLY_SETTLED     | 0.0          |
     
