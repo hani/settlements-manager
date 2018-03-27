@@ -47,4 +47,23 @@ Feature: Obligation state lifecycle
       | 4  | PARTIALLY_SETTLED | 50.0         |
       | 4  | FULLY_SETTLED     | 0.0          |
       | 5  | FULLY_SETTLED     | 0.0          |
+
+  Scenario: Amend open quantity when obligation is updated after receiving a confirmation
+    Given the following new obligations:
+      | id | quantity |
+      | 10 | 100      |
+    When the following confirmations are received:
+      | id   | obligationId | quantity |
+      | blah | 10           | 20       |
+    And the following new obligations:
+      | id | quantity |
+      | 10 | 150      |
+    Then the following obligation states are published:
+      | id | openQuantity |
+      | 10 | 100.0        |
+      | 10 | 80.0         |
+      | 10 | 130.0        |
+    And the obligation state store should contain:
+      | id | openQuantity |
+      | 10 | 130.0        |
     
