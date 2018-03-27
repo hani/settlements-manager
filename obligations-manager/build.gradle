@@ -10,6 +10,6 @@ dependencies {
   testCompile "org.apache.kafka:kafka_2.11:1.0.1:test"
   testCompile "org.apache.kafka:kafka-streams:1.0.1:test"
   testCompile "org.apache.kafka:kafka-clients:1.0.1:test"
-  testCompile "org.apache.curator:curator-test:2.9.0"
+  testCompile "org.apache.curator:curator-test:4.0.1"
   testCompile "org.slf4j:log4j-over-slf4j:1.7.25"
 }
