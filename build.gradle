@@ -23,7 +23,7 @@ subprojects {
   dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
-    compile 'io.github.microutils:kotlin-logging:1.4.9'
+    compile 'io.github.microutils:kotlin-logging:1.5.4'
     compile "ch.qos.logback:logback-classic:1.2.3"
   }
 
