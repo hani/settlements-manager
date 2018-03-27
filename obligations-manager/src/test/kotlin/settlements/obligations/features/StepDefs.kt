@@ -97,7 +97,6 @@ class StepDefs : En {
       val store = streams?.store(ObligationStateStore.name, QueryableStoreTypes.keyValueStore<String, ObligationState>())
       val actual = store?.all()?.asSequence()
       actual?.zip(table.rows.asSequence())?.forEach { (actual, expected) ->
-        println("Store key ${actual.key}")
         val actualMap = PropertyUtils.describe(actual!!.value)
         expected.forEach {
           actualMap[it.key].toString() shouldEqual it.value
@@ -133,7 +132,6 @@ class StepDefs : En {
       val actual = consumer.poll(5000L).map { it.value() }
       actual.zip(table.rows).forEach { (actual, expected) ->
         val actualMap = PropertyUtils.describe(actual!!)
-        println("Checking actual $actualMap against expected $expected")
         expected.forEach {
           actualMap[it.key].toString() shouldEqual it.value
         }
