@@ -9,16 +9,17 @@ import io.kotlintest.matchers.shouldEqual
 import org.apache.avro.specific.SpecificRecord
 import org.apache.commons.beanutils.PropertyUtils
 import org.apache.kafka.clients.consumer.ConsumerConfig
+import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.clients.producer.ProducerRecord
+import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.kafka.common.serialization.StringSerializer
 import org.apache.kafka.streams.KafkaStreams
 import org.apache.kafka.streams.StreamsConfig
 import org.apache.kafka.streams.integration.utils.EmbeddedKafkaCluster
-import org.apache.kafka.streams.integration.utils.IntegrationTestUtils
 import org.apache.kafka.streams.state.QueryableStoreTypes
 import settlements.ObligationState
 import settlements.generators.ConfirmationGen
@@ -122,12 +123,16 @@ class StepDefs : En {
           ConsumerConfig.AUTO_OFFSET_RESET_CONFIG to "earliest",
           ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG to StringDeserializer::class.java,
           ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG to InMemoryKafkaAvroDeserializer::class.java,
+          ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG to true,
           "specific.avro.reader" to true,
           "schema.registry.url" to "http://ignored_for_inmemory"
       ))
-      val actual = IntegrationTestUtils.waitUntilMinKeyValueRecordsReceived<String, ObligationState>(config, Topics.ObligationState, table.rows.size, 5_000)
+      val consumer = KafkaConsumer<String, ObligationState>(config)
+      consumer.seekToBeginning(Collections.emptyList())
+      consumer.assign(listOf(TopicPartition(Topics.ObligationState, 0)))
+      val actual = consumer.poll(5000L).map { it.value() }
       actual.zip(table.rows).forEach { (actual, expected) ->
-        val actualMap = PropertyUtils.describe(actual!!.value)
+        val actualMap = PropertyUtils.describe(actual!!)
         println("Checking actual $actualMap against expected $expected")
         expected.forEach {
           actualMap[it.key].toString() shouldEqual it.value

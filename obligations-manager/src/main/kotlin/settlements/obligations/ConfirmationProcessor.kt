@@ -18,15 +18,18 @@ class ConfirmationProcessor : AbstractProcessor<String, Confirmation>() {
   }
 
   override fun process(key: String, confirmation: Confirmation) {
-    val existing = store?.get(key)
-    val updated = if(existing != null) {
-      existing.openAmount = existing.openAmount - confirmation.amount
-      existing.openQuantity = existing.openQuantity - confirmation.quantity
-      if (existing.openQuantity.toInt() == 0) existing.status = SettlementStatus.FULLY_SETTLED
-      else if (existing.openQuantity < existing.obligation.quantity) existing.status = SettlementStatus.PARTIALLY_SETTLED
-      existing
-    } else null
-    context().forward(key, updated)
-    context().commit()
+    val state = store?.get(confirmation.obligationId)
+    if(state != null) {
+      state.openAmount = state.openAmount - confirmation.amount
+      state.openQuantity = state.openQuantity - confirmation.quantity
+      when {
+        state.openQuantity.toInt() == 0 -> state.status = SettlementStatus.FULLY_SETTLED
+        state.openQuantity == state.obligation.quantity -> state.status = SettlementStatus.OPEN
+        state.openQuantity < state.obligation.quantity -> state.status = SettlementStatus.PARTIALLY_SETTLED
+      }
+      println("New obligation: $state")
+      context().forward(confirmation.obligationId, state)
+      context().commit()
+    }
   }
 }

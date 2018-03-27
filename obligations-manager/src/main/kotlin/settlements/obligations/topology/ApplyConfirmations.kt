@@ -7,14 +7,15 @@ import settlements.obligations.ObligationStateStore
 
 object ApplyConfirmations {
   const val name = "ApplyConfirmations"
+  private const val sourceName = "confirmations-source"
 
   operator fun invoke(topology: Topology) {
     topology
-        .addSource("confirmations-source", Topics.Confirmations)
+        .addSource(sourceName, Topics.Confirmations)
         .addProcessor(
             name,
             ProcessorSupplier { ConfirmationProcessor() },
-            "confirmations-source"
+            sourceName
         )
     topology.connectProcessorAndStateStores(name, ObligationStateStore.name)
   }

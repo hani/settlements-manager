@@ -26,7 +26,7 @@ Feature: Obligation state lifecycle
       | id | status | openQuantity | openAmount |
       | 1  | OPEN   | 50.0         | 50.0       |
 
-  Scenario Outline: Apply confirmation to obligation state
+  Scenario: Apply confirmation to obligation state
     Given the following new obligations:
       | id | security | quantity | amount |
       | 1  | first    | 200      | 100    |
@@ -36,14 +36,15 @@ Feature: Obligation state lifecycle
       | 1  | 200.0        | 100.0      | OPEN   |
       | 2  | 20.0         | 10.0       | OPEN   |
     When the following confirmations are received:
-      | id   | obligationId | quantity   |
-      | <id> | <id>         | <quantity> |
+      | id | obligationId | quantity |
+      | A  | 1            | 150      |
+      | B  | 1            | 50       |
+      | C  | 2            | 20       |
     Then the following obligation states are published:
-      | id   | status   | openQuantity   |
-      | <id> | <status> | <openQuantity> |
-    Examples:
-      | id | quantity | status            | openQuantity |
-      | 1  | 150      | PARTIALLY_SETTLED | 50.0         |
-      | 1  | 50       | FULLY_SETTLED     | 0.0          |
-      | 2  | 20       | FULLY_SETTLED     | 0.0          |
+      | id | status            | openQuantity |
+      | 1  | OPEN              | 200.0        |
+      | 2  | OPEN              | 20.0         |
+      | 1  | PARTIALLY_SETTLED | 50.0         |
+      | 1  | FULLY_SETTLED     | 0.0          |
+      | 2  | FULLY_SETTLED     | 0.0          |
     

@@ -7,13 +7,14 @@ import settlements.obligations.ObligationStateStore
 
 object CreateOrUpdateObligationState {
   const val name = "CreateOrUpdateObligation"
+  private const val sourceName = "obligations-source"
   
   operator fun invoke(topology: Topology) {
     topology
-        .addSource("obligations-source", Topics.Obligations)
+        .addSource(sourceName, Topics.Obligations)
         .addProcessor(name,
             ProcessorSupplier { ObligationProcessor() },
-            "obligations-source"
+            sourceName
         )
     topology.connectProcessorAndStateStores(name, ObligationStateStore.name)
   }
