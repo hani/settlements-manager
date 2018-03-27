@@ -1,5 +1,6 @@
 package settlements.obligations
 
+import mu.KLogging
 import org.apache.kafka.streams.processor.AbstractProcessor
 import org.apache.kafka.streams.processor.ProcessorContext
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore
@@ -9,6 +10,8 @@ import settlements.SettlementStatus
 
 class ConfirmationProcessor : AbstractProcessor<String, Confirmation>() {
 
+  companion object : KLogging()
+  
   private var store: ReadOnlyKeyValueStore<String, ObligationState>? = null
 
   override fun init(context: ProcessorContext) {
@@ -19,6 +22,7 @@ class ConfirmationProcessor : AbstractProcessor<String, Confirmation>() {
 
   override fun process(key: String, confirmation: Confirmation) {
     val state = store?.get(confirmation.obligationId)
+    logger.info("Obligation for confirmation: $state")
     if(state != null) {
       state.openAmount = state.openAmount - confirmation.amount
       state.openQuantity = state.openQuantity - confirmation.quantity
@@ -27,6 +31,7 @@ class ConfirmationProcessor : AbstractProcessor<String, Confirmation>() {
         state.openQuantity == state.obligation.quantity -> state.status = SettlementStatus.OPEN
         state.openQuantity < state.obligation.quantity -> state.status = SettlementStatus.PARTIALLY_SETTLED
       }
+      logger.info("Sending $state")
       context().forward(confirmation.obligationId, state)
     }
   }
