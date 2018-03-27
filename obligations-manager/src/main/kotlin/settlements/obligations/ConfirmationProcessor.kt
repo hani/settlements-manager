@@ -19,7 +19,6 @@ class ConfirmationProcessor : AbstractProcessor<String, Confirmation>() {
 
   override fun process(key: String, confirmation: Confirmation) {
     val existing = store?.get(key)
-    println("Processing $confirmation")
     val updated = if(existing != null) {
       existing.openAmount = existing.openAmount - confirmation.amount
       existing.openQuantity = existing.openQuantity - confirmation.quantity

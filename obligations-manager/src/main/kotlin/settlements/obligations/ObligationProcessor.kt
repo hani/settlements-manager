@@ -19,7 +19,6 @@ class ObligationProcessor : AbstractProcessor<String, Obligation>() {
 
   override fun process(key: String, obligation: Obligation) {
     val existing = store?.get(key)
-    println("Processing $obligation, found existing $existing")
     val updated = if(existing == null) {
       ObligationState(obligation.id, obligation, SettlementStatus.OPEN, obligation.quantity, obligation.amount)
     } else {

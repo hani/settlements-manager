@@ -20,25 +20,29 @@ import org.apache.kafka.streams.StreamsConfig
 import org.apache.kafka.streams.integration.utils.EmbeddedKafkaCluster
 import org.apache.kafka.streams.integration.utils.IntegrationTestUtils
 import org.apache.kafka.streams.state.QueryableStoreTypes
-import org.slf4j.LoggerFactory
 import settlements.ObligationState
 import settlements.generators.ConfirmationGen
 import settlements.generators.ObligationGen
 import settlements.obligations.ObligationStateStore
 import settlements.obligations.ObligationsConsumer
 import settlements.obligations.topology.Topics
+import java.io.File
 import java.util.*
 
 class StepDefs : En {
 
-  private val log = LoggerFactory.getLogger(StepDefs::class.java)
+  companion object {
+    val cluster = EmbeddedKafkaCluster(1)
+    init {
+      cluster.start()
+    }
+  }
+  
   private val appId = "cucumber-test"
   private val schemaUrl = "http://ignored_for_inmemory"
   
   init {
     var streams: KafkaStreams? = null
-    val cluster = EmbeddedKafkaCluster(1)
-    cluster.start()
     val properties = Properties()
 
     properties.putAll(mapOf(
@@ -53,14 +57,15 @@ class StepDefs : En {
 
     InMemorySpecificAvroSerde.SchemaRegistryClient.register("$appId-ObligationsStateStore-changelog-value", ObligationState.`SCHEMA$`)
     Before { _ ->
+      File("data").deleteRecursively()
       cluster.deleteAndRecreateTopics(Topics.ObligationState, Topics.Confirmations, Topics.Obligations)
       streams = KafkaStreams(ObligationsConsumer.topology(InMemorySpecificAvroSerde<SpecificRecord>(), schemaUrl), properties)
       streams?.start()
-      streams?.state()
     }
 
     After { _ ->
       streams?.close()
+      File("data").deleteRecursively()
     }
 
     fun publish(topic: String, records: List<Pair<String, SpecificRecord>>) {
@@ -123,6 +128,7 @@ class StepDefs : En {
       val actual = IntegrationTestUtils.waitUntilMinKeyValueRecordsReceived<String, ObligationState>(config, Topics.ObligationState, table.rows.size, 5_000)
       actual.zip(table.rows).forEach { (actual, expected) ->
         val actualMap = PropertyUtils.describe(actual!!.value)
+        println("Checking actual $actualMap against expected $expected")
         expected.forEach {
           actualMap[it.key].toString() shouldEqual it.value
         }
