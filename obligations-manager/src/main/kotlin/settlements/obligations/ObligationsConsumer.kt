@@ -49,7 +49,3 @@ class ObligationsConsumer {
     }
   }
 }
-
-fun main(args: Array<String>) {
-  ObligationsConsumer().run()
-}
