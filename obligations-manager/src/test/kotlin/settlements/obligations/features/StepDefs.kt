@@ -26,22 +26,30 @@ class StepDefs : En {
 
   companion object {
     val cluster = EmbeddedKafkaCluster(1)
+
     init {
       cluster.start()
     }
   }
-  
+
   private val appId = "cucumber-test"
+  private val changeLogTopic = "$appId-ObligationsStateStore-changelog"
+
   private val schemaUrl = "http://ignored_for_inmemory"
-  
+
   init {
     var streams: KafkaStreams? = null
 
-    InMemorySpecificAvroSerde.SchemaRegistryClient.register("$appId-ObligationsStateStore-changelog-value", ObligationState.`SCHEMA$`)
+    InMemorySpecificAvroSerde.SchemaRegistryClient.register("$changeLogTopic-value", ObligationState.`SCHEMA$`)
     Before { _ ->
       File("data").deleteRecursively()
-      cluster.deleteAndRecreateTopics(Topics.ObligationState, Topics.Confirmations, Topics.Obligations)
-      streams = KafkaStreams(ObligationsConsumer.topology(InMemorySpecificAvroSerde<SpecificRecord>(), schemaUrl), 
+      cluster.deleteAndRecreateTopics(
+          Topics.ObligationState,
+          Topics.Confirmations,
+          Topics.Obligations,
+          changeLogTopic
+      )
+      streams = KafkaStreams(ObligationsConsumer.topology(InMemorySpecificAvroSerde<SpecificRecord>(), schemaUrl),
           KafkaProperties.streams(appId, schemaUrl, cluster.bootstrapServers()))
       streams?.start()
     }
@@ -51,9 +59,15 @@ class StepDefs : En {
       File("data").deleteRecursively()
     }
 
+    fun waitForRunning() {
+      while (streams?.state() != KafkaStreams.State.RUNNING) {
+        Thread.sleep(100)
+      }
+    }
+
     fun publish(topic: String, records: List<Pair<String, SpecificRecord>>) {
       val producer = KafkaProducer<String, SpecificRecord>(KafkaProperties.producer(cluster.bootstrapServers()))
-      records.map { 
+      records.map {
         producer.send(ProducerRecord(topic, it.first, it.second))
       }.forEach { it.get() }
       producer.close()
@@ -69,6 +83,7 @@ class StepDefs : En {
     }
 
     Then("^the obligation state store should contain:$") { table: DataTable ->
+      waitForRunning()
       val store = streams?.store(ObligationStateStore.name, QueryableStoreTypes.keyValueStore<String, ObligationState>())
       val actual = store?.all()?.asSequence()
       actual?.zip(table.rows.asSequence())?.forEach { (actual, expected) ->

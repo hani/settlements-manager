@@ -28,7 +28,6 @@ class ConfirmationProcessor : AbstractProcessor<String, Confirmation>() {
         state.openQuantity < state.obligation.quantity -> state.status = SettlementStatus.PARTIALLY_SETTLED
       }
       context().forward(confirmation.obligationId, state)
-      context().commit()
     }
   }
 }

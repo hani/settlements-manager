@@ -14,37 +14,37 @@ Feature: Obligation state lifecycle
   Scenario: Updated obligation overwrites existing one
     Given the following new obligations:
       | id | security | quantity | amount |
-      | 1  | abc      | 20       | 10     |
+      | 2  | abc      | 20       | 10     |
     When the following new obligations:
       | id | security | quantity | amount |
-      | 1  | abc      | 50       | 50     |
+      | 2  | abc      | 50       | 50     |
     Then the following obligation states are published:
       | id | status | openQuantity | openAmount |
-      | 1  | OPEN   | 20.0         | 10.0       |
-      | 1  | OPEN   | 50.0         | 50.0       |
+      | 2  | OPEN   | 20.0         | 10.0       |
+      | 2  | OPEN   | 50.0         | 50.0       |
     And the obligation state store should contain:
       | id | status | openQuantity | openAmount |
-      | 1  | OPEN   | 50.0         | 50.0       |
+      | 2  | OPEN   | 50.0         | 50.0       |
 
   Scenario: Apply confirmation to obligation state
     Given the following new obligations:
       | id | security | quantity | amount |
-      | 1  | first    | 200      | 100    |
-      | 2  | second   | 20       | 10     |
+      | 4  | first    | 200      | 100    |
+      | 5  | second   | 20       | 10     |
     And the following obligation states are published:
       | id | openQuantity | openAmount | status |
-      | 1  | 200.0        | 100.0      | OPEN   |
-      | 2  | 20.0         | 10.0       | OPEN   |
+      | 4  | 200.0        | 100.0      | OPEN   |
+      | 5  | 20.0         | 10.0       | OPEN   |
     When the following confirmations are received:
       | id | obligationId | quantity |
-      | A  | 1            | 150      |
-      | B  | 1            | 50       |
-      | C  | 2            | 20       |
+      | A  | 4            | 150      |
+      | B  | 4            | 50       |
+      | C  | 5            | 20       |
     Then the following obligation states are published:
       | id | status            | openQuantity |
-      | 1  | OPEN              | 200.0        |
-      | 2  | OPEN              | 20.0         |
-      | 1  | PARTIALLY_SETTLED | 50.0         |
-      | 1  | FULLY_SETTLED     | 0.0          |
-      | 2  | FULLY_SETTLED     | 0.0          |
+      | 4  | OPEN              | 200.0        |
+      | 5  | OPEN              | 20.0         |
+      | 4  | PARTIALLY_SETTLED | 50.0         |
+      | 4  | FULLY_SETTLED     | 0.0          |
+      | 5  | FULLY_SETTLED     | 0.0          |
     
