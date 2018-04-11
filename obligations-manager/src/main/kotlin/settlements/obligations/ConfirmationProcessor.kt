@@ -3,7 +3,7 @@ package settlements.obligations
 import mu.KLogging
 import org.apache.kafka.streams.processor.AbstractProcessor
 import org.apache.kafka.streams.processor.ProcessorContext
-import org.apache.kafka.streams.state.ReadOnlyKeyValueStore
+import org.apache.kafka.streams.state.KeyValueStore
 import settlements.Confirmation
 import settlements.ObligationState
 import settlements.SettlementStatus
@@ -12,12 +12,12 @@ class ConfirmationProcessor : AbstractProcessor<String, Confirmation>() {
 
   companion object : KLogging()
   
-  private var store: ReadOnlyKeyValueStore<String, ObligationState>? = null
+  private var store: KeyValueStore<String, ObligationState>? = null
 
   override fun init(context: ProcessorContext) {
     super.init(context)
     @Suppress("UNCHECKED_CAST")
-    store = context.getStateStore(ObligationStateStore.name) as ReadOnlyKeyValueStore<String, ObligationState>
+    store = context.getStateStore(ObligationStateStore.name) as KeyValueStore<String, ObligationState>
   }
 
   override fun process(key: String, confirmation: Confirmation) {
@@ -32,6 +32,7 @@ class ConfirmationProcessor : AbstractProcessor<String, Confirmation>() {
         state.openQuantity < state.obligation.quantity -> state.status = SettlementStatus.PARTIALLY_SETTLED
       }
       logger.info("Sending $state")
+      store?.put(confirmation.obligationId, state)
       context().forward(confirmation.obligationId, state)
     }
   }

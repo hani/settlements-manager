@@ -4,12 +4,9 @@ import cucumber.api.DataTable
 import cucumber.api.java8.En
 import io.confluent.kafka.streams.serdes.avro.InMemorySpecificAvroSerde
 import io.kotlintest.matchers.shouldEqual
+import mu.KLogging
 import org.apache.avro.specific.SpecificRecord
 import org.apache.commons.beanutils.PropertyUtils
-import org.apache.kafka.clients.consumer.KafkaConsumer
-import org.apache.kafka.clients.producer.KafkaProducer
-import org.apache.kafka.clients.producer.ProducerRecord
-import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.streams.KafkaStreams
 import org.apache.kafka.streams.integration.utils.EmbeddedKafkaCluster
 import org.apache.kafka.streams.state.QueryableStoreTypes
@@ -20,11 +17,11 @@ import settlements.obligations.ObligationStateStore
 import settlements.obligations.ObligationsConsumer
 import settlements.obligations.topology.Topics
 import java.io.File
-import java.util.*
+import kotlin.test.assertEquals
 
 class StepDefs : En {
 
-  companion object {
+  companion object : KLogging(){
     val cluster = EmbeddedKafkaCluster(1)
 
     init {
@@ -61,19 +58,12 @@ class StepDefs : En {
 
     fun waitForRunning() {
       while (streams?.state() != KafkaStreams.State.RUNNING) {
+        logger.info("current state ${streams?.state()}")
         Thread.sleep(100)
       }
     }
-
-    fun publish(topic: String, records: List<Pair<String, SpecificRecord>>) {
-      val producer = KafkaProducer<String, SpecificRecord>(KafkaProperties.producer(cluster.bootstrapServers()))
-      records.map {
-        producer.send(ProducerRecord(topic, it.first, it.second))
-      }.forEach { it.get() }
-      producer.close()
-    }
-
-    Given("^the following new obligations:$") { table: DataTable ->
+    
+    Given("^the following obligations:$") { table: DataTable ->
       val obligations = table.rows.map {
         val obligation = ObligationGen.generate()
         obligation.setProperties(it)
@@ -87,9 +77,9 @@ class StepDefs : En {
       val store = streams?.store(ObligationStateStore.name, QueryableStoreTypes.keyValueStore<String, ObligationState>())
       val actual = store?.all()?.asSequence()
       actual?.zip(table.rows.asSequence())?.forEach { (actual, expected) ->
-        val actualMap = PropertyUtils.describe(actual!!.value)
+        val actualMap = PropertyUtils.describe(actual!!.value).filterNot { it.key == "schema" }
         expected.forEach {
-          actualMap[it.key].toString() shouldEqual it.value
+          assertEquals(it.value, actualMap[it.key].toString(), "actual map: $actualMap")
         }
       }
       store?.all()?.asSequence()?.count() shouldEqual table.rows.size
@@ -105,12 +95,10 @@ class StepDefs : En {
     }
 
     Then("^the following obligation states are published:$") { table: DataTable ->
-      val consumer = KafkaConsumer<String, ObligationState>(KafkaProperties.consumer(cluster.bootstrapServers()))
-      consumer.seekToBeginning(Collections.emptyList())
-      consumer.assign(listOf(TopicPartition(Topics.ObligationState, 0)))
-      val actual = consumer.poll(5000L).map { it.value() }
+      val actual = poll(Topics.ObligationState, table.rows.size)
+      actual.size shouldEqual table.rows.size
       actual.zip(table.rows).forEach { (actual, expected) ->
-        val actualMap = PropertyUtils.describe(actual!!)
+        val actualMap = PropertyUtils.describe(actual)
         expected.forEach {
           actualMap[it.key].toString() shouldEqual it.value
         }
