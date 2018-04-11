@@ -40,6 +40,7 @@ class StepDefs : En {
     InMemorySpecificAvroSerde.SchemaRegistryClient.register("$changeLogTopic-value", ObligationState.`SCHEMA$`)
     Before { _ ->
       File("data").deleteRecursively()
+      cluster.deleteTopic("__consumer_offsets")
       cluster.deleteAndRecreateTopics(
           Topics.ObligationState,
           Topics.Confirmations,
